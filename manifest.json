@@ -1,0 +1,10 @@
+{
+  "name": "MiPyme Inventario",
+  "short_name": "MiPyme",
+  "description": "Gestión de inventario y ventas para MiPyme",
+  "start_url": "/index.html",
+  "display": "standalone",
+  "orientation": "portrait",
+  "background_color": "#f5f5f5",
+  "theme_color": "#1a1a2e"
+}

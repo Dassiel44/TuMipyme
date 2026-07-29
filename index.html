@@ -1,0 +1,310 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <meta name="theme-color" content="#1a1a2e">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <title>MiPyme Inventario</title>
+    <link rel="manifest" href="manifest.json">
+    <link rel="stylesheet" href="css/styles.css">
+</head>
+<body>
+    <!-- Navbar -->
+    <nav class="navbar">
+        <div class="nav-container">
+            <div class="nav-header">
+                <h1>🏪 MiPyme</h1>
+                <span class="nav-subtitle">Gestión de Inventario</span>
+            </div>
+            <div class="nav-buttons">
+                <button class="nav-btn active" data-tab="inventario">
+                    <span class="nav-icon">📦</span>
+                    <span class="nav-label">Inventario</span>
+                </button>
+                <button class="nav-btn" data-tab="ventas">
+                    <span class="nav-icon">🛒</span>
+                    <span class="nav-label">Ventas</span>
+                </button>
+                <button class="nav-btn" data-tab="historial">
+                    <span class="nav-icon">📊</span>
+                    <span class="nav-label">Historial</span>
+                </button>
+                <button class="nav-btn" data-tab="configuracion">
+                    <span class="nav-icon">⚙️</span>
+                    <span class="nav-label">Config</span>
+                </button>
+            </div>
+        </div>
+    </nav>
+
+    <div class="container">
+        <!-- ===== INVENTARIO ===== -->
+        <section id="inventario" class="tab-content active">
+            <div class="header-actions">
+                <button onclick="agregarCategoria()" class="btn-primary">
+                    <span>➕</span> Categoría
+                </button>
+                <button onclick="agregarProducto()" class="btn-primary">
+                    <span>➕</span> Producto
+                </button>
+            </div>
+            <div id="inventario-lista">
+                <div class="loading-spinner">Cargando inventario...</div>
+            </div>
+        </section>
+
+        <!-- ===== VENTAS ===== -->
+        <section id="ventas" class="tab-content">
+            <div class="ventas-header">
+                <h2>🛒 Carrito de Ventas</h2>
+                <div class="ventas-resumen">
+                    <div class="resumen-item">
+                        <span>Productos</span>
+                        <span id="carrito-count">0</span>
+                    </div>
+                    <div class="resumen-item">
+                        <span>Total</span>
+                        <span id="carrito-total">0.00 CUP</span>
+                    </div>
+                    <div class="resumen-item">
+                        <span>Ganancia</span>
+                        <span id="carrito-ganancia">0.00 CUP</span>
+                    </div>
+                </div>
+                
+                <div id="carrito-lista" style="margin:12px 0 16px 0;background:var(--color-surface);border-radius:10px;padding:12px;box-shadow:0 2px 8px var(--color-shadow);">
+                    <p style="color:var(--color-text-secondary);text-align:center;padding:10px 0;font-size:14px;">No hay productos en el carrito</p>
+                </div>
+                
+                <div style="display:flex;gap:10px;flex-wrap:wrap;">
+                    <button onclick="finalizarVenta()" class="btn-success btn-large" id="btn-finalizar-venta" disabled style="flex:1;min-width:150px;">
+                        ✅ Finalizar Venta
+                    </button>
+                    <button onclick="vaciarCarrito()" class="btn-danger btn-large" id="btn-vaciar-carrito" disabled style="flex:1;min-width:120px;">
+                        🗑️ Vaciar Carrito
+                    </button>
+                </div>
+            </div>
+            
+            <div class="ventas-categorias">
+                <div id="ventas-lista">
+                    <div class="loading-spinner">Cargando productos...</div>
+                </div>
+            </div>
+        </section>
+
+        <!-- ===== HISTORIAL ===== -->
+        <section id="historial" class="tab-content">
+            <h2>📊 Historial de Ventas</h2>
+            <div class="filtros-historial">
+                <input type="date" id="filtro-fecha" />
+                <select id="filtro-categoria">
+                    <option value="">Todas</option>
+                </select>
+                <button onclick="aplicarFiltros()" class="btn-primary">🔍 Filtrar</button>
+                <button onclick="exportarHistorial()" class="btn-success">📤 Exportar</button>
+                <button onclick="limpiarFiltros()" class="btn-secondary">🔄 Limpiar</button>
+                <button onclick="eliminarHistorialPorFecha()" class="btn-danger">🗑️ Eliminar historial</button>
+            </div>
+            <div id="historial-lista">
+                <div class="loading-spinner">Cargando historial...</div>
+            </div>
+        </section>
+
+        <!-- ===== CONFIGURACIÓN ===== -->
+        <section id="configuracion" class="tab-content">
+            <h2>⚙️ Configuración</h2>
+            
+            <!-- Nombre del Negocio -->
+            <div class="config-section">
+                <h3>🏪 Nombre del Negocio</h3>
+                <div style="display:flex;gap:10px;flex-wrap:wrap;align-items:center;">
+                    <input type="text" id="nombre-negocio" 
+                           style="flex:1;min-width:200px;padding:10px 12px;border:1px solid #dfe6e9;border-radius:8px;font-size:14px;transition:all 0.3s ease;"
+                           placeholder="Ej: Mi Tienda, Supermercado XYZ" />
+                    <button onclick="guardarNombreNegocio()" class="btn-primary">💾 Guardar</button>
+                    <button onclick="resetearNombreNegocio()" class="btn-secondary">↩️ Restaurar</button>
+                </div>
+                <p style="font-size:12px;color:#999;margin-top:8px;">
+                    El nombre aparecerá en la barra superior de la aplicación.
+                </p>
+            </div>
+
+            <!-- Selector de Temas -->
+            <div class="config-section">
+                <h3>🎨 Tema de la App</h3>
+                <div style="display:flex;flex-wrap:wrap;gap:8px;margin-bottom:12px;">
+                    <button onclick="aplicarTema('servicios')" class="btn-tema" data-tema="servicios" 
+                            style="background:linear-gradient(135deg,#1A365D,#D69E2E);color:white;padding:8px 16px;border-radius:8px;border:2px solid transparent;cursor:pointer;font-weight:600;transition:all 0.3s ease;">
+                        🏢 Servicios
+                    </button>
+                    <button onclick="aplicarTema('salud')" class="btn-tema" data-tema="salud"
+                            style="background:linear-gradient(135deg,#38A169,#319795);color:white;padding:8px 16px;border-radius:8px;border:2px solid transparent;cursor:pointer;font-weight:600;transition:all 0.3s ease;">
+                        💚 Salud
+                    </button>
+                    <button onclick="aplicarTema('gastronomia')" class="btn-tema" data-tema="gastronomia"
+                            style="background:linear-gradient(135deg,#C05621,#D69E2E);color:white;padding:8px 16px;border-radius:8px;border:2px solid transparent;cursor:pointer;font-weight:600;transition:all 0.3s ease;">
+                        ☕ Gastronomía
+                    </button>
+                    <button onclick="aplicarTema('tecnologia')" class="btn-tema" data-tema="tecnologia"
+                            style="background:linear-gradient(135deg,#6B46C1,#00B5D8);color:white;padding:8px 16px;border-radius:8px;border:2px solid transparent;cursor:pointer;font-weight:600;transition:all 0.3s ease;">
+                        💻 Tecnología
+                    </button>
+                    <button onclick="aplicarTema('ferreteria')" class="btn-tema" data-tema="ferreteria"
+                            style="background:linear-gradient(135deg,#DD6B20,#2D3748);color:white;padding:8px 16px;border-radius:8px;border:2px solid transparent;cursor:pointer;font-weight:600;transition:all 0.3s ease;">
+                        🔧 Ferretería
+                    </button>
+                    <button onclick="aplicarTema('clasico')" class="btn-tema" data-tema="clasico"
+                            style="background:linear-gradient(135deg,#0F4C81,#FF6B6B);color:white;padding:8px 16px;border-radius:8px;border:2px solid transparent;cursor:pointer;font-weight:600;transition:all 0.3s ease;">
+                        ⭐ Clásico
+                    </button>
+                </div>
+                <p style="font-size:12px;color:#999;margin-top:8px;">
+                    Tema actual: <span id="tema-actual-texto">Clásico</span>
+                </p>
+            </div>
+
+            <!-- Apariencia (Modo Oscuro) -->
+            <div class="config-section">
+                <h3>🌓 Modo Oscuro</h3>
+                <div style="display:flex;align-items:center;gap:12px;">
+                    <span>Modo Oscuro</span>
+                    <label class="switch">
+                        <input type="checkbox" id="darkModeToggle" onchange="toggleDarkMode()">
+                        <span class="slider round"></span>
+                    </label>
+                    <span id="modo-texto">Desactivado</span>
+                </div>
+            </div>
+            
+            <!-- Categorías -->
+            <div class="config-section">
+                <h3>📂 Categorías</h3>
+                <div id="lista-categorias-config"></div>
+            </div>
+            
+            <!-- Datos -->
+            <div class="config-section">
+                <h3>💾 Datos</h3>
+                <div style="display:flex;flex-wrap:wrap;gap:8px;">
+                    <button onclick="exportarDatos()" class="btn-success">📤 Exportar todo</button>
+                    <button onclick="verExportacionGuardada()" class="btn-info">📂 Ver exportación</button>
+                    <button onclick="importarDatos()" class="btn-info" style="background:linear-gradient(135deg,#6c5ce7,#a29bfe);">📥 Importar</button>
+                    <button onclick="limpiarDatos()" class="btn-danger">🗑️ Limpiar datos</button>
+                </div>
+                <p style="font-size:12px;color:#999;margin-top:8px;">
+                    Los datos se guardan automáticamente en el dispositivo.
+                    Al exportar, los datos se guardan en la memoria de la app.
+                </p>
+            </div>
+            
+            <!-- Acerca de -->
+            <div class="config-section">
+                <h3>ℹ️ Acerca de</h3>
+                <p><strong>MiPyme Inventario v2.0</strong></p>
+                <p>Gestión de inventario y ventas para tu negocio</p>
+                <p>Datos almacenados localmente en tu dispositivo</p>
+                <p style="font-size:12px;color:#999;margin-top:10px;">Desarrollado por: Dassiel Ernesto Quintero Rubido</p>
+            </div>
+        </section>
+    </div>
+
+    <!-- ===== MODALES ===== -->
+    
+    <!-- Modal Producto -->
+    <div id="modal-producto" class="modal">
+        <div class="modal-content">
+            <span class="close" onclick="cerrarModal()">&times;</span>
+            <h2 id="modal-producto-title">Agregar Producto</h2>
+            <form id="form-producto" onsubmit="guardarProducto(event)">
+                <input type="hidden" id="producto-id" />
+                
+                <label for="prod-nombre">Nombre del producto *</label>
+                <input type="text" id="prod-nombre" required placeholder="Ej: Queso, Leche, Pan" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false" />
+                
+                <label for="prod-categoria">Categoría *</label>
+                <select id="prod-categoria" required></select>
+                
+                <label for="prod-cantidad">Cantidad</label>
+                <input type="number" id="prod-cantidad" min="0" step="0.1" value="0" placeholder="0" />
+                
+                <label for="prod-unidad">Unidad de medida *</label>
+                <select id="prod-unidad" required>
+                    <option value="unidad">Unidad (piezas, paquetes)</option>
+                    <option value="libra">Libra (lb)</option>
+                    <option value="kilogramo">Kilogramo (kg)</option>
+                    <option value="litro">Litro (L)</option>
+                    <option value="galon">Galón (gal)</option>
+                    <option value="docena">Docena (12 uds)</option>
+                    <option value="metro">Metro (m)</option>
+                    <option value="yarda">Yarda (yd)</option>
+                    <option value="onza">Onza (oz)</option>
+                </select>
+                
+                <label for="prod-imagen">Imagen del producto</label>
+                <div style="display:flex;gap:10px;align-items:center;flex-wrap:wrap;margin:4px 0 8px;">
+                    <input type="file" id="prod-imagen" accept="image/*" style="flex:1;padding:6px;" />
+                    <button type="button" onclick="limpiarImagen()" class="btn-secondary btn-small">🗑️ Quitar imagen</button>
+                </div>
+                <div id="preview-imagen" style="margin:4px 0 8px;display:none;">
+                    <img id="preview-img" src="#" alt="Vista previa" style="max-width:100px;max-height:100px;border-radius:8px;border:1px solid #dfe6e9;padding:4px;" />
+                    <span style="font-size:12px;color:#999;margin-left:8px;">Vista previa</span>
+                </div>
+                
+                <label for="prod-precio-compra">Precio de compra (CUP)</label>
+                <input type="number" id="prod-precio-compra" step="0.01" min="0" value="0" placeholder="0.00" />
+                
+                <label for="prod-precio-venta">Precio de venta (CUP)</label>
+                <input type="number" id="prod-precio-venta" step="0.01" min="0" value="0" placeholder="0.00" />
+                
+                <div class="form-buttons">
+                    <button type="submit" class="btn-primary">💾 Guardar</button>
+                    <button type="button" onclick="cerrarModal()" class="btn-secondary">Cancelar</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Modal Categoría -->
+    <div id="modal-categoria" class="modal">
+        <div class="modal-content">
+            <span class="close" onclick="cerrarModal()">&times;</span>
+            <h2 id="modal-categoria-title">Nueva Categoría</h2>
+            <form id="form-categoria" onsubmit="guardarCategoria(event)">
+                <input type="hidden" id="categoria-id" />
+                <label for="cat-nombre">Nombre de la categoría *</label>
+                <input type="text" id="cat-nombre" required placeholder="Ej: Comida, Aseo, Bebidas" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false" />
+                <div class="form-buttons">
+                    <button type="submit" class="btn-primary">💾 Guardar</button>
+                    <button type="button" onclick="cerrarModal()" class="btn-secondary">Cancelar</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Modal Carrito -->
+    <div id="modal-carrito" class="modal">
+        <div class="modal-content modal-carrito">
+            <span class="close" onclick="cerrarModal()">&times;</span>
+            <h2>🛒 Resumen de Venta</h2>
+            <div id="carrito-resumen"></div>
+            <div class="carrito-total-final">
+                <p><strong>Total:</strong> <span id="carrito-total-final">0.00</span> CUP</p>
+                <p><strong>Ganancia:</strong> <span id="carrito-ganancia-final">0.00</span> CUP</p>
+            </div>
+            <div class="form-buttons">
+                <button onclick="confirmarVentaFinal()" class="btn-success btn-large">✅ Confirmar Venta</button>
+                <button onclick="cerrarModal()" class="btn-secondary">Cancelar</button>
+            </div>
+        </div>
+    </div>
+
+    <script src="js/database.js"></script>
+    <script src="js/ui.js"></script>
+    <script src="js/inventario.js"></script>
+    <script src="js/ventas.js"></script>
+    <script src="js/historial.js"></script>
+    <script src="js/exportar.js"></script>
+</body>
+</html>
