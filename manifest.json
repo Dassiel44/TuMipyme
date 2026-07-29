@@ -1,12 +1,15 @@
-
 {
-  "background_color": "#ffffff",
-  "dir": "ltr",
+  "name": "MiPyme Inventario",
+  "short_name": "MiPyme",
+  "description": "Gestión de inventario y ventas para MiPyme",
+  "start_url": "/index.html",
   "display": "standalone",
-  "name": "dassiel44.github",
-  "orientation": "any",
-  "scope": "/",
-  "short_name": "dassiel44.github",
-  "start_url": "/",
-  "theme_color": "#1a1a2e"
-}
+  "orientation": "portrait",
+  "background_color": "#f5f5f5",
+  "theme_color": "#1a1a2e",
+  "icons": [
+    {
+      "src": "assets/icons/icon-512x512.png",
+      "sizes": "512x512",
+      "type": "image/png"
+    
